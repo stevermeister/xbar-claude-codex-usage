@@ -2,9 +2,7 @@
 
 An [xbar](https://xbarapp.com) (or [SwiftBar](https://swiftbar.app)) menu-bar plugin that shows **Claude Code** and **OpenAI Codex** usage side by side, each with the rate-limit window closest to throttling.
 
-```
-CC 🟢 7d 17%  ⬩  CX 🔴 7d 100%
-```
+<img src="docs/screenshot.png" alt="Menu bar showing Claude Code and Codex usage" width="320">
 
 The dropdown lists every window (5h / 7d / per-model), when each one resets, the Codex plan, credits, available limit resets, and how old the data is.
 
