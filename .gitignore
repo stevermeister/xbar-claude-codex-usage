@@ -1,0 +1,4 @@
+*_usage_cache.json
+.credentials.json
+__pycache__/
+.DS_Store
