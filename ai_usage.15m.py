@@ -15,23 +15,27 @@ CODEX_CACHE_FILE = os.path.expanduser("~/.codex_usage_cache.json")
 CACHE_TTL        = 800
 
 def get_token():
-    # Credentials file (Linux-style / older installs)
+    # Collect from both sources and use the one that expires last,
+    # so a stale credentials file can't shadow a fresh Keychain token.
+    candidates = []
     try:
         with open(os.path.expanduser("~/.claude/.credentials.json")) as f:
-            return json.load(f).get("claudeAiOauth", {}).get("accessToken")
+            candidates.append(json.load(f).get("claudeAiOauth", {}))
     except Exception:
         pass
-    # macOS Keychain
     try:
         r = subprocess.run(
             ["security", "find-generic-password", "-s", "Claude Code-credentials", "-w"],
             capture_output=True, text=True
         )
         if r.returncode == 0:
-            return json.loads(r.stdout.strip()).get("claudeAiOauth", {}).get("accessToken")
+            candidates.append(json.loads(r.stdout.strip()).get("claudeAiOauth", {}))
     except Exception:
         pass
-    return None
+    candidates = [c for c in candidates if c.get("accessToken")]
+    if not candidates:
+        return None
+    return max(candidates, key=lambda c: c.get("expiresAt") or 0)["accessToken"]
 
 def read_cache(path):
     try:
