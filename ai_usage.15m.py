@@ -32,10 +32,13 @@ def get_token():
             candidates.append(json.loads(r.stdout.strip()).get("claudeAiOauth", {}))
     except Exception:
         pass
-    candidates = [c for c in candidates if c.get("accessToken")]
+    candidates = [c for c in candidates if isinstance(c, dict) and c.get("accessToken")]
     if not candidates:
         return None
-    return max(candidates, key=lambda c: c.get("expiresAt") or 0)["accessToken"]
+    def expiry(c):
+        e = c.get("expiresAt")
+        return e if isinstance(e, (int, float)) else 0
+    return max(candidates, key=expiry)["accessToken"]
 
 def read_cache(path):
     try:
